@@ -7,9 +7,6 @@ var connection = mysql.createConnection(condb);
 /////////   logic //////////////////////
 
 
-
-
-
 router.get('/', function(req, res, next) {
 	res.render('index', { title: 'Express' });
 });
