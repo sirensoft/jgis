@@ -69,9 +69,10 @@ router.get('/test',function(req,res){
 
 router.post('/add',function(req,res){
 	var updata = req.body;
+	console.log(updata);
 	var sql = "update house set xgis="+updata.xgis+",ygis="+updata.ygis +" where hcode= '"+updata.hcode+"'";
 	connection.query(sql,[updata],function(err,result){
-		if (err) throw err;
+		if (err) console.log(err);
 		res.json({'save':'ok'})
 
 	});
