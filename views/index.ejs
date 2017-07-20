@@ -28,7 +28,7 @@
   		background-repeat:   no-repeat;
   		background-position: center center;
   	}
-      
+
     .point-label {  white-space: nowrap;background:null;}
     
 </style>
@@ -47,181 +47,200 @@
 	<div id='map'></div>
 
 	<script>
-		L.mapbox.accessToken = 'pk.eyJ1IjoidGVobm5uIiwiYSI6ImNpZzF4bHV4NDE0dTZ1M200YWxweHR0ZzcifQ.lpRRelYpT0ucv1NN08KUWQ';
-		var map = L.mapbox.map('map');
-	//base map
-	var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-		maxZoom: 20,
-		subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-	});
-	var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-		maxZoom: 20,
-		subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-	});
-	var googleStreet = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-		maxZoom: 20,
-		subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-	});
-	var osmStreet = L.mapbox.tileLayer('mapbox.streets');
-    // end base map
+        $(function(){
 
-    map.setView([13.539,100.745],6);
-    var hash = new L.Hash(map);
-    L.control.locate().addTo(map);
-    //L.Control.measureControl().addTo(map);
+          L.mapbox.accessToken = 'pk.eyJ1IjoidGVobm5uIiwiYSI6ImNpZzF4bHV4NDE0dTZ1M200YWxweHR0ZzcifQ.lpRRelYpT0ucv1NN08KUWQ';
+          var map = L.mapbox.map('map');
 
-    var houseFeature = L.featureGroup();
+          var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+              maxZoom: 20,
+              subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+          });
+          var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+              maxZoom: 20,
+              subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+          });
+          var googleStreet = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+              maxZoom: 20,
+              subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+          });
+          var osmStreet = L.mapbox.tileLayer('mapbox.streets');
 
-    L.control.layers({
 
-    	'Google Street':googleStreet,
-    	'Google Hybrid':googleHybrid.addTo(map),
-    	'Google Sat':googleSat,
-    	'OSM Street':osmStreet
-    },{
-        'หลังคาเรือน':houseFeature.addTo(map)
+          map.setView([13.539,100.745],6);
+          var hash = new L.Hash(map);
+          L.control.locate().addTo(map);
+
+
+          var houseClusterGroup = new L.MarkerClusterGroup();
+
+          L.control.layers({
+
+           'Google Street':googleStreet,
+           'Google Hybrid':googleHybrid.addTo(map),
+           'Google Sat':googleSat,
+           'OSM Street':osmStreet
+       },{
+        'หลังคาเรือน':houseClusterGroup.addTo(map)
     }).addTo(map);
 
 
+          var featureGroup = L.featureGroup();
+
+          var drawControl = new L.Control.Draw({
+           edit: {
+              featureGroup: featureGroup
+          },
+          draw:{
+              polyline:false,
+              polygon:false,
+              circle:false,
+              rectangle:false
+          }
+      }).addTo(map);
+
+          var labelLayer = L.featureGroup().addTo(map);
+
+          var houseLayer = L.mapbox.featureLayer();
+          houseLayer.loadURL('http://localhost:3000/house')
+          .setFilter(function(feature){
+            return (feature.geometry.coordinates[1]!= null) && (feature.geometry.coordinates[0]!= null)
+        })
+          .on('ready',function(){
+            houseLayer.eachLayer(function(layer){
+                var latLng =  [layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]];
+                var marker = L.marker(latLng,{
+                    icon: L.mapbox.marker.icon({'marker-symbol': 'warehouse', 'marker-color': '#0000FF'}),
+                    title:layer.feature.properties.title
+                });
+                marker.bindPopup(layer.feature.properties.title);
+                marker.addTo(houseClusterGroup);
+                var lbHtml = '<span style="background-color:#FFF8DC;">';
+                lbHtml+=layer.feature.properties.hno+' หมู่ ';
+                lbHtml+=layer.feature.properties.villno;
+                lbHtml+='<span>';
+                L.marker(latLng,{icon:L.divIcon({className:'point-label', html:lbHtml})}).addTo(labelLayer);
+
+            });//end loop
+
+            var popupcontent = '<input type="text" class="txt"/><div class="show" style="overflow: scroll;min-width: 220px;"></div>';
+            popupcontent+= '<div class="btn-add" style="display:none"><button>บันทึก</button></div>';
+
+            map.on('draw:created', function(e) {
+
+                var url = $(location).attr('href'); 
+
+                if(e.layerType === 'marker'){
+                    featureGroup.addLayer(e.layer);
+                    var drawFeatures = featureGroup.toGeoJSON();
+                    var point = drawFeatures.features[drawFeatures.features.length-1];
+                    var latLng = [point.geometry.coordinates[1],point.geometry.coordinates[0]];
+                    var newMarker=L.marker(latLng,{
+                        //draggable: true
+                    }).addTo(map);
+                    var popup = newMarker.bindPopup(popupcontent,{maxWidth:'auto'});
+                    newMarker.openPopup();
 
 
-    var featureGroup = L.featureGroup();
+                    $('.txt').on('keypress',function(e){
+                        if(e.keyCode!==13) return;
+                        $('.show').html('');
+                        var s = $(this).val();
+                        houseLayer.getGeoJSON().features.forEach(function(found){
+                            if(found.properties.hno == s){
+                                var hcode = found.properties.hcode;
 
-    var drawControl = new L.Control.Draw({
-    	edit: {
-    		featureGroup: featureGroup
-    	},
-    	draw:{
-    		polyline:false,
-    		polygon:false,
-    		circle:false,
-    		rectangle:false
-    	}
-    }).addTo(map);
+                                $('.show').append('<a href=# class ="hc" data-hcode='+hcode+'>'+found.properties.title+'<a><br>');
 
-    var houseGroup = L.featureGroup().addTo(map);
-    var labelLayer = L.featureGroup().addTo(map);
+                            }
+                        })//loop
 
-   
-    $.getJSON('http://localhost:3000/house',function(dataServer){
-    	//console.log(dataServer.features);
-    	dataServer.features.forEach(function(data){
-    		if(data.geometry.coordinates[0] !== null){
-    			L.mapbox.featureLayer(data).addTo(houseFeature);
-
-                var coords = data.geometry.coordinates;
-                L.marker([coords[1],coords[0]], 
-                    {icon:L.divIcon({className:'point-label', html:'<span style="background-color:#FFF8DC;">'+data.properties.hno+' หมู่ '+data.properties.villno+'<span>'})}
-                    )
-                .addTo(labelLayer)
-
-            }
-        });
-
-    	var popupcontent = '<input type="text" class="txt"/><div class="show" style="overflow: scroll;min-width: 220px;"></div>';
-    	popupcontent+= '<div class="btn-add" style="display:none"><button>บันทึก</button></div>'
-    	map.on('draw:created', function(e) {
-
-    		var url = $(location).attr('href');	
-    		featureGroup.addLayer(e.layer);
-    		if(e.layerType === 'marker'){
-    			var point = featureGroup.toGeoJSON();
-    			point = point.features[point.features.length-1]; 
-    			point.properties['marker-symbol']='warehouse';  
-    			point.properties['marker-color']='#0000FF';      		
-    			var house = L.mapbox.featureLayer(point).addTo(houseGroup);
-    			house.eachLayer(function(layer){
-    				
-    				var pop = layer.bindPopup(popupcontent,{maxWidth:'auto'});
-    				layer.openPopup();
-
-    				$('.txt').on('keypress',function(e){
-    					if(e.keyCode!==13) return;
-    					$('.show').html('');
-    					var s = $(this).val();
-    					dataServer.features.forEach(function(found){
-    						if(found.properties.hno == s){
-    							var hcode = found.properties.hcode;
-
-    							$('.show').append('<a href=# class ="hc" data-hcode='+hcode+'>'+found.properties.title+'<a><br>');
-
-    						}
-    					})//loop
-
-    					$('.hc').click(function(){
-    						var hcode = $(this).data("hcode");
-    						$('.txt').val($(this).text());
-    						$('.show').html('')
-    						$('.btn-add').toggle()
-    						$('.btn-add').click(function(){
+                        $('.hc').click(function(){
+                            var hcode = $(this).data("hcode");
+                            $('.txt').val($(this).text());
+                            $('.show').html('')
+                            $('.btn-add').toggle()
+                            $('.btn-add').click(function(){
 
 
-    							var json = {
-    								'hcode':hcode,
-    								'ygis':layer.feature.geometry.coordinates[1],
-    								'xgis':layer.feature.geometry.coordinates[0]
-    							}
+                                var json = {
+                                    'hcode':hcode,
+                                    'ygis':newMarker.getLatLng().lat,
+                                    'xgis':newMarker.getLatLng().lng
+                                }
 
-    							$.ajax({
-    								type: 'POST',
-    								url: 'http://localhost:3000/add',
-    								data: JSON.stringify(json),
-    								contentType: "application/json; charset=utf-8",
-    								dataType: "json"
-    							}).done(function(data){ 
+                                $.ajax({
+                                    type: 'POST',
+                                    url: 'http://localhost:3000/add',
+                                    data: JSON.stringify(json),
+                                    contentType: "application/json; charset=utf-8",
+                                    dataType: "json"
+                                }).done(function(data){ 
 
-    								console.log(data);       
-    								window.location.href= url;
+                                    console.log(data);       
+                                    window.location.href= url;
                                     if(data.save==='ok'){
                                         location.reload();
                                     }else{
                                         alert('error')
                                     }
                                 });
-    							
-    							
-    							//location.reload();
-    						});
+                                
+                                
+                                //location.reload();
+                            });
 
-    					});//click
-
-
-
-    				});//keypress
-
-    				$('.txt').click(function(){
-    					$(this).select();
-    				});//click
-    				pop.on('popupclose',function(){
-    					layer.remove();
-    				})
-    				
-
-      			});//loop layer
-
-    		}
-    });// end draw
+                        });//click
 
 
 
-  });//end getjson
+                    });//keypress
 
-    map.on('overlayadd', function(layer){
-        console.log('add -'+layer.name)
-        if(layer.name==='หลังคาเรือน'){
-            labelLayer.addTo(map)
-        }
-    });
 
-    map.on('overlayremove', function(layer){
-        console.log('remove -'+ layer.name)
-        if(layer.name==='หลังคาเรือน'){
-            labelLayer.remove();
-        }
-    });
+                    newMarker.on('dragend',function(e){
+                        console.log(e.target.getLatLng());
+                    });
+                    $('.txt').click(function(){
+                        $(this).select();
+                    });//click
+                    popup.on('popupclose',function(){
+                        newMarker.remove();
+                    })
 
 
 
+
+            }// end if
+
+        });// end draw
+
+
+        });// end Ready
+
+
+
+map.on('overlayadd', function(layer){
+    console.log('add -'+layer.name)
+    if(layer.name==='หลังคาเรือน'){
+        labelLayer.addTo(map)
+    }
+});
+
+map.on('overlayremove', function(layer){
+    console.log('remove -'+ layer.name)
+    if(layer.name==='หลังคาเรือน'){
+        labelLayer.remove();
+    }
+});
+
+
+
+
+
+
+
+
+}); // end program
 
 </script>
 </body>
