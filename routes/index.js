@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
 
-var fs = require('fs');
+
 var condb = require('../condb');
 var connection = mysql.createConnection(condb);
 
@@ -10,46 +10,22 @@ var connection = mysql.createConnection(condb);
 
 /////////   logic //////////////////////
 
-var jsonWrite = function(){
-	var sql = "SELECT t.hcode,t.hno,v.villname,RIGHT(t.villcode,2) villno";
-	sql+= " ,t.ygis lat,t.xgis lng FROM house t LEFT JOIN village v on v.villcode = t.villcode";
-	var houseCollection=  {
-		"type": "FeatureCollection",
-		"name": "house",
-		"features":[]
-	};
-	connection.query(sql, function (err, result, fields) {
-		if (err) throw err;
-		result.forEach(function(row){
-			houseCollection.features.push({
-				"type": "Feature",
-				"properties": { 
-					'hcode':row.hcode,
-					'hno':row.hno,
-					'villno':row.villno,
-					'villname':row.villname, 
-					'title': row.hno +' หมู่ '+row.villno +' บ.'+row.villname, 
-					'marker-symbol':'warehouse',  
-    				'marker-color':'#0000FF',
-
-					
-				},
-				"geometry": { "type": "Point", "coordinates": [JSON.parse(row.lng),JSON.parse(row.lat)] } 
-			})
-		});//end Loop
-		fs.writeFile('./public/house.json', JSON.stringify(houseCollection), function (err) {
-  		if (err) return console.log(err);
-  			
-		});
-	
-	})//con
-};
 
 router.get('/favicon.ico', function(req, res) {
-    res.status(204);
+	res.status(204);
 });
 router.get('/', function(req, res, next) {
-	//jsonWrite();
+
+	var sql = "UPDATE house t SET t.xgis = t.xgis*1 , t.ygis = t.ygis*1";
+	connection.query(sql,function (err, result) {
+		if(err)console.log(err);
+		var sql = "UPDATE house t SET t.xgis = NULL , t.ygis = NULL WHERE t.xgis = 0 or t.ygis = 0";
+		connection.query(sql,function(err,result){
+			if(err)console.log(err);
+		});
+	});
+	
+
 	res.render('index');
 });
 
@@ -102,7 +78,7 @@ router.get('/house',function(req,res){
 					'villname':row.villname, 
 					'title': row.hno +' หมู่ '+row.villno +' บ.'+row.villname, 
 					'marker-symbol':'warehouse',  
-    				'marker-color':'#0000FF',
+					'marker-color':'#0000FF',
 
 					
 				},
