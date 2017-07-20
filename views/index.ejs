@@ -12,7 +12,9 @@
 <!--[if lt IE 9]>
   <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.ie.css' rel='stylesheet' />
   <![endif]-->
-  <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/css/font-awesome.min.css' rel='stylesheet' />
+  <!--<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/css/font-awesome.min.css' rel='stylesheet' />-->
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.css' rel='stylesheet' />
   <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.js'></script>
@@ -31,97 +33,103 @@
 
     .point-label {  white-space: nowrap;background:null;}
     
-</style>
+  </style>
 </head>
 <body>
-	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'></script>
-	<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css' rel='stylesheet' />
-	<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
-
-	<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-	<script src='https://api.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script>
-	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-hash/v0.2.1/leaflet-hash.js'></script>
-
-	<script src="https://unpkg.com/leaflet.measurecontrol@1.0.0"></script>
+  <script src="./javascripts/jquery-3.2.1.min.js"></script>
+  <script src="./javascripts/Leaflet.Control.Custom.js"></script>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'></script>
+  <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css' rel='stylesheet' />
+  <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
 
 
-	<div id='map'></div>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-hash/v0.2.1/leaflet-hash.js'></script>
 
-	<script>
-        $(function(){
+  <script src="https://unpkg.com/leaflet.measurecontrol@1.0.0"></script>
 
-          L.mapbox.accessToken = 'pk.eyJ1IjoidGVobm5uIiwiYSI6ImNpZzF4bHV4NDE0dTZ1M200YWxweHR0ZzcifQ.lpRRelYpT0ucv1NN08KUWQ';
-          var map = L.mapbox.map('map');
-
-          var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-              maxZoom: 20,
-              subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-          });
-          var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-              maxZoom: 20,
-              subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-          });
-          var googleStreet = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-              maxZoom: 20,
-              subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-          });
-          var osmStreet = L.mapbox.tileLayer('mapbox.streets');
+  <!-- BOOTSTRAP Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js""></script>
 
 
-          map.setView([13.539,100.745],6);
-          var hash = new L.Hash(map);
-          L.control.locate().addTo(map);
+  <div id='map'></div>
+
+  <script>
+    $(function(){
+
+      L.mapbox.accessToken = 'pk.eyJ1IjoidGVobm5uIiwiYSI6ImNpZzF4bHV4NDE0dTZ1M200YWxweHR0ZzcifQ.lpRRelYpT0ucv1NN08KUWQ';
+      var map = L.mapbox.map('map');
+
+      var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+      });
+      var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+      });
+      var googleStreet = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+      });
+      var osmStreet = L.mapbox.tileLayer('mapbox.streets');
 
 
-          var houseClusterGroup = new L.MarkerClusterGroup();
+      map.setView([13.539,100.745],6);
+      var hash = new L.Hash(map);
+      L.control.locate().addTo(map);
 
-          L.control.layers({
 
-           'Google Street':googleStreet,
-           'Google Hybrid':googleHybrid.addTo(map),
-           'Google Sat':googleSat,
-           'OSM Street':osmStreet
-       },{
-        'หลังคาเรือน':houseClusterGroup.addTo(map)
+      var houseClusterGroup = new L.MarkerClusterGroup();
+
+      L.control.layers({
+
+       'Google Street':googleStreet,
+       'Google Hybrid':googleHybrid.addTo(map),
+       'Google Sat':googleSat,
+       'OSM Street':osmStreet
+     },{
+      'หลังคาเรือน':houseClusterGroup.addTo(map)
     }).addTo(map);
 
 
-          var featureGroup = L.featureGroup();
+      var featureGroup = L.featureGroup();
 
-          var drawControl = new L.Control.Draw({
-           edit: {
-              featureGroup: featureGroup
-          },
-          draw:{
-              polyline:false,
-              polygon:false,
-              circle:false,
-              rectangle:false
-          }
-      }).addTo(map);
+      var drawControl = new L.Control.Draw({
+       edit: {
+        featureGroup: featureGroup
+      },
+      draw:{
+        polyline:false,
+        polygon:false,
+        circle:false,
+        rectangle:false
+      }
+    }).addTo(map);
 
-          var labelLayer = L.featureGroup().addTo(map);
+      var labelLayer = L.featureGroup().addTo(map);
 
-          var houseLayer = L.mapbox.featureLayer();
-          houseLayer.loadURL('/house')
+      var houseLayer = L.mapbox.featureLayer();
+      houseLayer.loadURL('/house')
           //houseLayer.loadURL('./house.json')
           .setFilter(function(feature){
             return (feature.geometry.coordinates[1]!= null) && (feature.geometry.coordinates[0]!= null)
-        })
+          })
           .on('ready',function(){
             houseLayer.eachLayer(function(layer){
-                var latLng =  [layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]];
-                var marker = L.marker(latLng,{
-                    icon: L.mapbox.marker.icon({'marker-symbol': 'warehouse', 'marker-color': '#0000FF'}),
-                    title:layer.feature.properties.title
-                });
-                marker.bindPopup(layer.feature.properties.title);
-                marker.addTo(houseClusterGroup);
-                var lbHtml = '<span style="background-color:#FFF8DC;">';
-                lbHtml+=layer.feature.properties.hno+' หมู่ ';
-                lbHtml+=layer.feature.properties.villno;
-                lbHtml+='<span>';
-                L.marker(latLng,{icon:L.divIcon({className:'point-label', html:lbHtml})}).addTo(labelLayer);
+              var latLng =  [layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]];
+              var marker = L.marker(latLng,{
+                icon: L.mapbox.marker.icon({'marker-symbol': 'warehouse', 'marker-color': '#0000FF'}),
+                title:layer.feature.properties.title
+              });
+              marker.bindPopup(layer.feature.properties.title);
+              marker.addTo(houseClusterGroup);
+              var lbHtml = '<span style="background-color:#FFF8DC;">';
+              lbHtml+=layer.feature.properties.hno+' หมู่ ';
+              lbHtml+=layer.feature.properties.villno;
+              lbHtml+='<span>';
+              L.marker(latLng,{icon:L.divIcon({className:'point-label', html:lbHtml})}).addTo(labelLayer);
 
             });//end loop
 
@@ -130,67 +138,67 @@
 
             map.on('draw:created', function(e) {
 
-                var url = $(location).attr('href'); 
+              var url = $(location).attr('href'); 
 
-                if(e.layerType === 'marker'){
-                    featureGroup.addLayer(e.layer);
-                    var drawFeatures = featureGroup.toGeoJSON();
-                    var point = drawFeatures.features[drawFeatures.features.length-1];
-                    var latLng = [point.geometry.coordinates[1],point.geometry.coordinates[0]];
-                    var newMarker=L.marker(latLng,{
+              if(e.layerType === 'marker'){
+                featureGroup.addLayer(e.layer);
+                var drawFeatures = featureGroup.toGeoJSON();
+                var point = drawFeatures.features[drawFeatures.features.length-1];
+                var latLng = [point.geometry.coordinates[1],point.geometry.coordinates[0]];
+                var newMarker=L.marker(latLng,{
                         //draggable: true
-                    }).addTo(map);
-                    var popup = newMarker.bindPopup(popupcontent,{maxWidth:'auto'});
-                    newMarker.openPopup();
+                      }).addTo(map);
+                var popup = newMarker.bindPopup(popupcontent,{maxWidth:'auto'});
+                newMarker.openPopup();
 
 
-                    $('.txt').on('keypress',function(e){
-                        if(e.keyCode!==13) return;
-                        $('.show').html('');
-                        var s = $(this).val();
-                        houseLayer.getGeoJSON().features.forEach(function(found){
-                            if(found.properties.hno == s){
-                                var hcode = found.properties.hcode;
+                $('.txt').on('keypress',function(e){
+                  if(e.keyCode!==13) return;
+                  $('.show').html('');
+                  var s = $(this).val();
+                  houseLayer.getGeoJSON().features.forEach(function(found){
+                    if(found.properties.hno == s){
+                      var hcode = found.properties.hcode;
 
-                                $('.show').append('<a href=# class ="hc" data-hcode='+hcode+'>'+found.properties.title+'<a><br>');
+                      $('.show').append('<a style="cursor:pointer"  class ="hc" data-hcode='+hcode+'>'+found.properties.title+'<a><br>');
 
-                            }
+                    }
                         })//loop
 
-                        $('.hc').click(function(){
-                            var hcode = $(this).data("hcode");
-                            $('.txt').val($(this).text());
-                            $('.show').html('')
-                            $('.btn-add').toggle()
-                            $('.btn-add').click(function(){
+                  $('.hc').click(function(){
+                    var hcode = $(this).data("hcode");
+                    $('.txt').val($(this).text());
+                    $('.show').html('')
+                    $('.btn-add').toggle()
+                    $('.btn-add').click(function(){
 
 
-                                var json = {
-                                    'hcode':hcode,
-                                    'ygis':newMarker.getLatLng().lat,
-                                    'xgis':newMarker.getLatLng().lng
-                                }
+                      var json = {
+                        'hcode':hcode,
+                        'ygis':newMarker.getLatLng().lat,
+                        'xgis':newMarker.getLatLng().lng
+                      }
 
-                                $.ajax({
-                                    type: 'POST',
-                                    url: '/add',
-                                    data: JSON.stringify(json),
-                                    contentType: "application/json; charset=utf-8",
-                                    dataType: "json"
-                                }).done(function(data){ 
+                      $.ajax({
+                        type: 'POST',
+                        url: '/add',
+                        data: JSON.stringify(json),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json"
+                      }).done(function(data){ 
 
-                                    console.log(data);       
-                                    window.location.href= url;
-                                    if(data.save==='ok'){
-                                        location.reload();
-                                    }else{
-                                        alert('error')
-                                    }
-                                });
-                                
-                                
+                        console.log(data);       
+                        //window.location.href= url;
+                        if(data.save==='ok'){
+                          location.reload();
+                        }else{
+                          alert('error')
+                        }
+                      });
+
+
                                 //location.reload();
-                            });
+                              });
 
                         });//click
 
@@ -199,15 +207,15 @@
                     });//keypress
 
 
-                    newMarker.on('dragend',function(e){
-                        console.log(e.target.getLatLng());
-                    });
-                    $('.txt').click(function(){
-                        $(this).select();
+                newMarker.on('dragend',function(e){
+                  console.log(e.target.getLatLng());
+                });
+                $('.txt').click(function(){
+                  $(this).select();
                     });//click
-                    popup.on('popupclose',function(){
-                        newMarker.remove();
-                    })
+                popup.on('popupclose',function(){
+                  newMarker.remove();
+                })
 
 
 
@@ -222,21 +230,38 @@
 
 
 map.on('overlayadd', function(layer){
-    console.log('add -'+layer.name)
-    if(layer.name==='หลังคาเรือน'){
-        labelLayer.addTo(map)
-    }
+  console.log('add -'+layer.name)
+  if(layer.name==='หลังคาเรือน'){
+    labelLayer.addTo(map)
+  }
 });
 
 map.on('overlayremove', function(layer){
-    console.log('remove -'+ layer.name)
-    if(layer.name==='หลังคาเรือน'){
-        labelLayer.remove();
-    }
+  console.log('remove -'+ layer.name)
+  if(layer.name==='หลังคาเรือน'){
+    labelLayer.remove();
+  }
 });
 
 
+L.control.custom({
+                position: 'topleft',
+                content : '<button type="button" class="btn btn-default btn-reload">'+
+                          '    <i class="fa fa-refresh"></i>'+
+                          '</button>',
+                classes : 'btn-group-vertical btn-group-sm',
+                style   :
+                {
+                    margin: '10px',
+                    padding: '0px 0 0 0',
+                    cursor: 'pointer'
+                },
+             
+            }).addTo(map);
 
+            $('.btn-reload').click(function(){
+              location.reload();
+            });
 
 
 
