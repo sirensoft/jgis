@@ -117,7 +117,7 @@
             return (feature.geometry.coordinates[1]!= null) && (feature.geometry.coordinates[0]!= null)
           })
           .on('ready',function(){
-            map.fitBounds(houseLayer.getBounds());;
+            //map.fitBounds(houseLayer.getBounds());;
             houseLayer.eachLayer(function(layer){
               var latLng =  [layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]];
               var marker = L.marker(latLng,{
