@@ -26,15 +26,8 @@ $(function() {
 			subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
 		}).addTo(map);
 
-		$.getJSON("http://localhost:3000/house", function(data) {
-			L.geoJson(data, {
-				pointToLayer: function (feature, latlng) {
-					console.log(latlng)
-					if(latlng.lat>0)
-					return L.marker(latlng);
-				}
-			}).addTo(map);
-		});
+		L.mapbox.featureLayer().loadURL('./house.json').addTo(map);
+		
 
 });
 	</script>

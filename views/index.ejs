@@ -44,6 +44,7 @@
 
 	<script src="https://unpkg.com/leaflet.measurecontrol@1.0.0"></script>
 
+
 	<div id='map'></div>
 
 	<script>
@@ -102,7 +103,8 @@
           var labelLayer = L.featureGroup().addTo(map);
 
           var houseLayer = L.mapbox.featureLayer();
-          houseLayer.loadURL('http://localhost:3000/house')
+          houseLayer.loadURL('/house')
+          //houseLayer.loadURL('./house.json')
           .setFilter(function(feature){
             return (feature.geometry.coordinates[1]!= null) && (feature.geometry.coordinates[0]!= null)
         })
@@ -171,7 +173,7 @@
 
                                 $.ajax({
                                     type: 'POST',
-                                    url: 'http://localhost:3000/add',
+                                    url: '/add',
                                     data: JSON.stringify(json),
                                     contentType: "application/json; charset=utf-8",
                                     dataType: "json"
