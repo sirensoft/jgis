@@ -10,12 +10,7 @@ var connection = mysql.createConnection(condb);
 
 /////////   logic //////////////////////
 
-
-router.get('/favicon.ico', function(req, res) {
-	res.status(204);
-});
-router.get('/', function(req, res, next) {
-
+var upHouse =function(){
 	var sql = "UPDATE house t SET t.xgis = t.xgis*1 , t.ygis = t.ygis*1";
 	connection.query(sql,function (err, result) {
 		if(err)console.log(err);
@@ -24,8 +19,14 @@ router.get('/', function(req, res, next) {
 			if(err)console.log(err);
 		});
 	});
-	
+};
 
+router.get('/updatehouse',function(req,res){
+	upHouse();
+	res.send("update x,y on house success!.")
+})
+
+router.get('/', function(req, res, next) {
 	res.render('index');
 });
 

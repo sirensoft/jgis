@@ -80,7 +80,7 @@
       var hash = new L.Hash(map);
       L.control.locate().addTo(map);
 
-
+      var featureGroup = L.featureGroup();
       var houseClusterGroup = new L.MarkerClusterGroup();
 
       L.control.layers({
@@ -94,7 +94,7 @@
     }).addTo(map);
 
 
-      var featureGroup = L.featureGroup();
+
 
       var drawControl = new L.Control.Draw({
        edit: {
@@ -110,6 +110,7 @@
 
       var labelLayer = L.featureGroup().addTo(map);
 
+
       var houseLayer = L.mapbox.featureLayer();
       houseLayer.loadURL('/house')
           //houseLayer.loadURL('./house.json')
@@ -117,7 +118,11 @@
             return (feature.geometry.coordinates[1]!= null) && (feature.geometry.coordinates[0]!= null)
           })
           .on('ready',function(){
-            //map.fitBounds(houseLayer.getBounds());;
+
+
+            //map.fitBounds(houseLayer.getBounds());
+
+            
             houseLayer.eachLayer(function(layer){
               var latLng =  [layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]];
               var marker = L.marker(latLng,{
@@ -173,12 +178,13 @@
                     $('.btn-add').toggle()
                     $('.btn-add').click(function(){
 
-
+                    var title = $('.txt').val();
                       var json = {
                         'hcode':hcode,
                         'ygis':newMarker.getLatLng().lat,
                         'xgis':newMarker.getLatLng().lng
                       }
+                      var jsonFeature =turf.point([json.xgis,json.ygis],{'title':'test test'});
 
                       $.ajax({
                         type: 'POST',
@@ -191,7 +197,15 @@
                         console.log(data);       
                         //window.location.href= url;
                         if(data.save==='ok'){
-                          location.reload();
+                          //location.reload();
+
+                         
+
+                          L.marker([json.ygis,json.xgis],{
+                            icon: L.mapbox.marker.icon({'marker-symbol': 'warehouse', 'marker-color': '#0000FF'})                        
+                          }).bindPopup(title).addTo(houseClusterGroup);
+                         newMarker.remove();
+                          
                         }else{
                           alert('error')
                         }
@@ -246,23 +260,23 @@ map.on('overlayremove', function(layer){
 
 
 L.control.custom({
-                position: 'topleft',
-                content : '<button type="button" class="btn btn-default btn-reload">'+
-                          '    <i class="fa fa-refresh"></i>'+
-                          '</button>',
-                classes : 'btn-group-vertical btn-group-sm',
-                style   :
-                {
-                    margin: '10px',
-                    padding: '0px 0 0 0',
-                    cursor: 'pointer'
-                },
-             
-            }).addTo(map);
+  position: 'topleft',
+  content : '<button type="button" class="btn btn-default btn-reload">'+
+  '    <i class="fa fa-refresh"></i>'+
+  '</button>',
+  classes : 'btn-group-vertical btn-group-sm',
+  style   :
+  {
+    margin: '10px',
+    padding: '0px 0 0 0',
+    cursor: 'pointer'
+  },
 
-            $('.btn-reload').click(function(){
-              location.reload();
-            });
+}).addTo(map);
+
+$('.btn-reload').click(function(){
+  location.reload();
+});
 
 
 
