@@ -91,4 +91,8 @@ router.get('/house',function(req,res){
 
 })
 
+router.post('/auth', function(req, res) {
+	res.json(req.body.name)
+});
+
 module.exports = router;
