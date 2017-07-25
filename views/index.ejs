@@ -61,7 +61,7 @@
 	<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
 
 
-	<script src='https://api.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script>
+	<script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>   
 	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-hash/v0.2.1/leaflet-hash.js'></script>
 
 	<script src="https://unpkg.com/leaflet.measurecontrol@1.0.0"></script>
@@ -274,6 +274,38 @@
         });// end draw
 
 
+            $('.btn-circle').click(function(){
+            	var r=prompt("กรุณาระบุรัศมี (เมตร)", 100);
+
+            	var circleRadius=L.circle(map.getCenter(),Number(r)).addTo(map);
+            	circleRadius.setStyle({'color':'red','dashArray':4,weight: 2,fillColor:'red'});
+            	circleRadius.on('click',function(e){
+            		var layer = e.target;
+		//console.log(layer);
+		var latlng = layer.getLatLng();
+		var circleJson = turf.circle([latlng.lng,latlng.lat],Number(r)/1000 ,100, 'kilometers', {});
+		
+		var circleCollection = turf.featureCollection([circleJson]);
+
+		//var resGeojson = turf.within(,circleCollection);
+
+		var houseGeojson =[];
+		houseLayer.eachLayer(function(layer){
+			if (layer.feature.geometry.coordinates[1]!= null & layer.feature.geometry.coordinates[0]!= null){
+				houseGeojson.push(layer.feature);
+			}
+		});
+		var houseCollection = turf.featureCollection(houseGeojson);
+
+		var resGeojson = turf.within(houseCollection,circleCollection);
+		var countHouse = resGeojson.features.length;
+		alert("พื้นที่นี้มี  "+countHouse+" หลังคาเรือน")
+		
+		
+	})
+});//end click radius
+
+
         });// end Ready
 
 
@@ -307,6 +339,22 @@ searchControl.on('search:locationfound',function(data){
 });
 
 
+
+L.control.custom({
+	position: 'topleft',
+	content : '<button type="button" class="btn btn-default btn-circle">'+
+	'    <i class="fa fa-circle-o"></i>'+
+	'</button>',
+	classes : 'btn-group-vertical btn-group-sm',
+	style   :
+	{
+		margin: '10px',
+		padding: '0px 0 0 0',
+		cursor: 'pointer'
+	},
+
+}).addTo(map);
+
 L.control.custom({
 	position: 'topleft',
 	content : '<button type="button" class="btn btn-default btn-reload">'+
@@ -326,34 +374,11 @@ $('.btn-reload').click(function(){
 	location.reload();
 });
 
-L.control.custom({
-	position: 'topleft',
-	content : '<button type="button" class="btn btn-default btn-circle">'+
-	'    <i class="fa fa-circle-o"></i>'+
-	'</button>',
-	classes : 'btn-group-vertical btn-group-sm',
-	style   :
-	{
-		margin: '10px',
-		padding: '0px 0 0 0',
-		cursor: 'pointer'
-	},
-
-}).addTo(map);
 
 
-$('.btn-circle').click(function(){
-
-	var circleRadius=L.circle(map.getCenter(),100).addTo(map);
-	circleRadius.setStyle({'color':'red'});
-	circleRadius.on('click',function(e){
-		var layer = e.target;
-		console.log(layer)
-	})
-});
 
 var crosshairIcon = L.icon({
-    iconUrl: 'images/crosshair.png',
+	iconUrl: 'images/crosshair.png',
     iconSize:     [25, 25], // size of the icon
     //iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
 });
@@ -362,12 +387,12 @@ crosshair.addTo(map);
 
 // Move the crosshair to the center of the map when the user pans
 map.on('move', function(e) {
-    crosshair.setLatLng(map.getCenter());
-    
+	crosshair.setLatLng(map.getCenter());
+
 });
 
 map.on('moveend', function(e) {    
-    var latlng = crosshair.getLatLng();
+	var latlng = crosshair.getLatLng();
     //console.log(latlng)
 });
 
