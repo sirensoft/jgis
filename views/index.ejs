@@ -294,6 +294,18 @@ map.on('overlayremove', function(layer){
 	}
 });
 
+// search control
+
+var searchControl = new L.Control.Search({layer: houseClusterGroup });
+map.addControl(searchControl);
+searchControl.on('search:locationfound',function(data){
+	console.log(data)
+	var latLngs = [ data.latlng ];  	
+	var pointFoundBounds = L.latLngBounds(latLngs);
+	map.fitBounds(pointFoundBounds);
+	data.layer.openPopup();
+});
+
 
 L.control.custom({
 	position: 'topleft',
@@ -314,18 +326,49 @@ $('.btn-reload').click(function(){
 	location.reload();
 });
 
+L.control.custom({
+	position: 'topleft',
+	content : '<button type="button" class="btn btn-default btn-circle">'+
+	'    <i class="fa fa-circle-o"></i>'+
+	'</button>',
+	classes : 'btn-group-vertical btn-group-sm',
+	style   :
+	{
+		margin: '10px',
+		padding: '0px 0 0 0',
+		cursor: 'pointer'
+	},
+
+}).addTo(map);
 
 
-// search control
+$('.btn-circle').click(function(){
 
-var searchControl = new L.Control.Search({layer: houseClusterGroup });
-map.addControl(searchControl);
-searchControl.on('search:locationfound',function(data){
-	console.log(data)
-	var latLngs = [ data.latlng ];  	
-	var pointFoundBounds = L.latLngBounds(latLngs);
-	map.fitBounds(pointFoundBounds);
-	data.layer.openPopup();
+	var circleRadius=L.circle(map.getCenter(),100).addTo(map);
+	circleRadius.setStyle({'color':'red'});
+	circleRadius.on('click',function(e){
+		var layer = e.target;
+		console.log(layer)
+	})
+});
+
+var crosshairIcon = L.icon({
+    iconUrl: 'images/crosshair.png',
+    iconSize:     [25, 25], // size of the icon
+    //iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
+});
+crosshair = new L.marker(map.getCenter(), {icon: crosshairIcon, clickable:false});
+crosshair.addTo(map);
+
+// Move the crosshair to the center of the map when the user pans
+map.on('move', function(e) {
+    crosshair.setLatLng(map.getCenter());
+    
+});
+
+map.on('moveend', function(e) {    
+    var latlng = crosshair.getLatLng();
+    //console.log(latlng)
 });
 
 
