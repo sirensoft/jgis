@@ -74,6 +74,8 @@
 	<link rel="stylesheet" type="text/css" href="leaflet-search/dist/leaflet-search.min.css"/>
 	<script src="leaflet-search/dist/leaflet-search.min.js"></script>
 
+	<script src="https://cdn.rawgit.com/alertifyjs/alertify.js/v1.0.10/dist/js/alertify.js"></script>
+
 	<div class="title">JGIS</div>
 	<div id='map'></div>
 
@@ -299,7 +301,7 @@
 
 		var resGeojson = turf.within(houseCollection,circleCollection);
 		var countHouse = resGeojson.features.length;
-		alert("พื้นที่นี้มี  "+countHouse+" หลังคาเรือน")
+		alertify.alert("พื้นที่นี้มี  "+countHouse+" หลังคาเรือน" +"<br>"+"dddd")
 		
 		
 	})
