@@ -100,6 +100,12 @@ router.get('/auth', function(req, res) {
 });
 
 router.get('/adl',function(req,res){
+	var adlCollection=  {
+		"type": "FeatureCollection",
+		"name": "adl",
+		"features":[]
+	};
+
 	var sql = "SELECT p.fname,p.hcode,h.hno,RIGHT(v.villcode,2) villno,v.villname\n" +
 ",h.ygis lat,h.xgis lng from f43specialpp  t\n" +
 "LEFT JOIN person p ON p.pid = t.pid\n" +
@@ -108,10 +114,27 @@ router.get('/adl',function(req,res){
 "WHERE t.ppspecial= '1b1282'";
 connection.query(sql,function(err, result, fields){
 	if(err) throw err;
-	console.log(result)
+	result.forEach(function(row){
+		adlCollection.features.push({
+			"type": "Feature",
+				"properties": { 
+					'hcode':row.hcode,
+					'hno':row.hno,
+					'villno':row.villno,
+					'villname':row.villname, 
+					'title': row.hno +' หมู่ '+row.villno +' บ.'+row.villname, 
+					'marker-symbol':'disability',  
+					'marker-color':'#FF4500',
 
-})
+					
+				},
+				"geometry": { "type": "Point", "coordinates": [JSON.parse(row.lng),JSON.parse(row.lat)] } 
+		});
+	})//loop
+	res.json(adlCollection)
 
-})
+})// query
+
+})//get
 
 module.exports = router;

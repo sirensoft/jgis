@@ -104,6 +104,7 @@
 
 			var featureGroup = L.featureGroup();
 			var houseClusterGroup = new L.MarkerClusterGroup();
+			var disabLayer = L.mapbox.featureLayer();
 
 			L.control.layers({
 
@@ -112,7 +113,8 @@
 				'Google Sat':googleSat,
 				'OSM Street':osmStreet
 			},{
-				'หลังคาเรือน':houseClusterGroup.addTo(map)
+				'หลังคาเรือน':houseClusterGroup.addTo(map),
+				'ติดเตียง':disabLayer
 			}).addTo(map);
 
 
@@ -130,9 +132,18 @@
 				}
 			}).addTo(map);
 
+
+			// Load data
+			disabLayer.loadURL('/adl')
+			.setFilter(function(feature){
+				return (feature.geometry.coordinates[1]!= null) && (feature.geometry.coordinates[0]!= null);
+			})
+			.on('ready',function(){
+
+			});
+
+
 			var labelLayer = L.featureGroup().addTo(map);
-
-
 			var houseLayer = L.mapbox.featureLayer();
 			houseLayer.loadURL('/house')
           //houseLayer.loadURL('./house.json')
@@ -270,7 +281,8 @@
 map.on('overlayadd', function(layer){
 	console.log('add -'+layer.name)
 	if(layer.name==='หลังคาเรือน'){
-		labelLayer.addTo(map)
+		labelLayer.addTo(map);
+		//houseLayer.addTo(map);
 	}
 });
 
@@ -278,6 +290,7 @@ map.on('overlayremove', function(layer){
 	console.log('remove -'+ layer.name)
 	if(layer.name==='หลังคาเรือน'){
 		labelLayer.remove();
+		//houseLayer.remove();
 	}
 });
 
@@ -305,7 +318,7 @@ $('.btn-reload').click(function(){
 
 // search control
 
-var searchControl = new L.Control.Search({layer: houseLayer });
+var searchControl = new L.Control.Search({layer: houseClusterGroup });
 map.addControl(searchControl);
 searchControl.on('search:locationfound',function(data){
 	console.log(data)
