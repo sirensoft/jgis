@@ -28,9 +28,9 @@
   		top:0;
   		left: 0;
   		right: 0;
-  		height: 30px;
+  		height: 35px;
 
-  		background-color: rgba(0,0,0,0.5);
+  		background-color: rgba(48, 72, 166, 1);
   		color: white;  
   		text-align: center;
   	}
@@ -40,7 +40,7 @@
   		left: 0;
   		right: 0;
   		bottom:0;
-  		margin-top: 30px;
+  		margin-top: 35px;
   	}
   	.leaflet-control-draw-measure {
   		background-image: url('/images/measure-control.png');
@@ -308,10 +308,11 @@ $('.btn-reload').click(function(){
 var searchControl = new L.Control.Search({layer: houseLayer });
 map.addControl(searchControl);
 searchControl.on('search:locationfound',function(data){
-	//console.log(data)
+	console.log(data)
 	var latLngs = [ data.latlng ];  	
 	var pointFoundBounds = L.latLngBounds(latLngs);
 	map.fitBounds(pointFoundBounds);
+	data.layer.openPopup();
 });
 
 
