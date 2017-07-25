@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
+var jwt  = require('jsonwebtoken'); 
 
 
 var condb = require('../condb');
@@ -91,8 +92,11 @@ router.get('/house',function(req,res){
 
 })
 
-router.post('/auth', function(req, res) {
-	res.json(req.body.name)
+router.get('/auth', function(req, res) {
+	
+		var token = jwt.sign('tehnn', '1234');
+        res.send(token)
+	
 });
 
 module.exports = router;
