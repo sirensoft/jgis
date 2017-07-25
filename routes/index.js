@@ -99,4 +99,19 @@ router.get('/auth', function(req, res) {
 	
 });
 
+router.get('/adl',function(req,res){
+	var sql = "SELECT p.fname,p.hcode,h.hno,RIGHT(v.villcode,2) villno,v.villname\n" +
+",h.ygis lat,h.xgis lng from f43specialpp  t\n" +
+"LEFT JOIN person p ON p.pid = t.pid\n" +
+"LEFT JOIN house h ON h.hcode = p.hcode\n" +
+"LEFT JOIN village v on h.villcode = v.villcode\n" +
+"WHERE t.ppspecial= '1b1282'";
+connection.query(sql,function(err, result, fields){
+	if(err) throw err;
+	console.log(result)
+
+})
+
+})
+
 module.exports = router;
