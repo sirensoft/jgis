@@ -277,6 +277,8 @@
 
 
             $('.btn-circle').click(function(){
+            	
+
             	var r=prompt("กรุณาระบุรัศมี (เมตร)", 100);
 
             	var circleRadius=L.circle(map.getCenter(),Number(r)).addTo(map);
@@ -385,7 +387,7 @@ $('.btn-reload').click(function(){
 
 var crosshairIcon = L.icon({
 	iconUrl: 'images/crosshair.png',
-    iconSize:     [25, 25], // size of the icon
+    iconSize:     [35, 35], // size of the icon
     //iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
 });
 crosshair = new L.marker(map.getCenter(), {icon: crosshairIcon, clickable:false});
