@@ -1,11 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
-var jwt  = require('jsonwebtoken'); 
+
 
 
 var condb = require('../condb');
 var connection = mysql.createConnection(condb);
+var authen = require('../authen');
 
 
 
@@ -27,7 +28,7 @@ router.get('/updatehouse',function(req,res){
 	res.send("update x,y on house success!.")
 })
 
-router.get('/', function(req, res, next) {
+router.get('/',authen.check,function(req, res, next) {
 	res.render('index');
 });
 
@@ -36,10 +37,15 @@ router.get('/maptest', function(req, res, next) {
 });
 
 router.get('/test',function(req,res){
-	var sql ='select username,fullname from user limit 3';
-	connection.query(sql, function (err, result, fields) {
+	var sql ='select count(*) user from user where username =? and password=? limit 1';
+	connection.query(sql,['adm','mda'] ,function (err, result, fields) {
 		if(err) throw err;
-		res.json({'data':result})
+		var json = [];
+		result.forEach(function(row){
+			json.push({data:row});
+		});
+		res.json(json[0].data.user);
+		
 		
 	})
 	
@@ -92,12 +98,7 @@ router.get('/house',function(req,res){
 
 })
 
-router.get('/auth', function(req, res) {
-	
-		var token = jwt.sign('tehnn', '1234');
-        res.send(token)
-	
-});
+
 
 router.get('/adl',function(req,res){
 	var adlCollection=  {

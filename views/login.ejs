@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>A Pen by  Zoltan Kohalmy</title>
+  
+  
+  <link rel="stylesheet" href="stylesheets/login.css">
+  <script src="./javascripts/jquery-3.2.1.min.js"></script> 
+
+  
+</head>
+
+<body>
+
+    <form id='my-form'>
+      <header>Login</header>
+      <label>Username <span>*</span></label>
+      <input id='user'/>
+      <div class="help">At least 6 character</div>
+      <label>Password <span>*</span></label>
+      <input id='pass'/>
+      <div class="help">Use upper and lowercase lettes as well</div>
+      <button>Login</button>
+  </form>
+
+  <script>
+    $('#my-form').submit(function(e){
+        var u = $('#user').val();
+        var p = $('#pass').val();
+        var data = {'user':u,'pass':p};
+
+        $.ajax({
+            url: '/login/check',
+            type: 'post',
+            dataType: 'json',           
+            data: data,
+            success: function (response) {
+                //console.log(response.token);
+                window.location = '/?token='+response.token;
+
+            },
+        });
+
+    });
+
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
