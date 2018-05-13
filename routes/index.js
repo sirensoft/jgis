@@ -28,7 +28,7 @@ router.get('/updatehouse',function(req,res){
 	res.send("update x,y on house success!.")
 })
 
-router.get('/',authen.check,function(req, res, next) {
+router.get('/',function(req, res, next) {
 	res.render('index');
 });
 

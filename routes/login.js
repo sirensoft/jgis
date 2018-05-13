@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
+
+var expressJwt = require('express-jwt');
 var jwt  = require('jsonwebtoken'); 
 
 var condb = require('../condb');
