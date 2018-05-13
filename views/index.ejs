@@ -277,7 +277,7 @@
         });// end draw
 
 
-            $('.btn-circle').click(function(){
+            $('.btn-circle').click(function(){ //begin click radius
             	
 
             	var r=prompt("กรุณาระบุรัศมี (เมตร)", 100);
@@ -288,7 +288,8 @@
             		var layer = e.target;
 		//console.log(layer);
 		var latlng = layer.getLatLng();
-		var circleJson = turf.circle([latlng.lng,latlng.lat],Number(r)/1000 ,100, 'kilometers', {});
+		var optionsCircle = {steps: 100, units: 'kilometers'};
+		var circleJson = turf.circle([latlng.lng,latlng.lat],Number(r)/1000 ,optionsCircle);
 		
 		var circleCollection = turf.featureCollection([circleJson]);
 
