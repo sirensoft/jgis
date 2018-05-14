@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset=utf-8 />
-	<title>JGIS 1.0.1</title>
+	<title>nodeGIS 1.0.1</title>
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 	<script src='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js'></script>
 	<link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
@@ -76,7 +76,7 @@
 
 	<script src="./javascripts/alertify.js"></script>
 
-	<div class="title">JGIS 1.0</div>
+	<div class="title">nodeGIS 1.0</div>
 	<div id='map'></div>
 
 	<script>
@@ -128,7 +128,7 @@
 				},
 				draw:{
 					polyline:false,
-					polygon:false,
+					polygon:true,
 					circle:false,
 					rectangle:false
 				},
@@ -156,7 +156,11 @@
           .on('ready',function(){
 
 
-            //map.fitBounds(houseLayer.getBounds());
+			//map.fitBounds(houseLayer.getBounds());
+			
+			var houseGeojson =[];
+		
+		
 
             
             houseLayer.eachLayer(function(layer){
@@ -164,23 +168,51 @@
             	var marker = L.marker(latLng,{
             		icon: L.mapbox.marker.icon({'marker-symbol': 'warehouse', 'marker-color': '#0000FF'}),
             		title:layer.feature.properties.title
-            	});
+            });
             	marker.bindPopup(layer.feature.properties.title);
             	marker.addTo(houseClusterGroup);
             	var lbHtml = '<span style="background-color:#FFF8DC;">';
             	lbHtml+=layer.feature.properties.hno+' หมู่ ';
             	lbHtml+=layer.feature.properties.villno;
             	lbHtml+='<span>';
-            	L.marker(latLng,{icon:L.divIcon({className:'point-label', html:lbHtml})}).addTo(labelLayer);
+				L.marker(latLng,{icon:L.divIcon({className:'point-label', html:lbHtml})}).addTo(labelLayer);
+				
+				if (layer.feature.geometry.coordinates[1]!= null & layer.feature.geometry.coordinates[0]!= null){
+					houseGeojson.push(layer.feature);
+				}
 
-            });//end loop
+			});//end loop
+
+			var houseCollection = turf.featureCollection(houseGeojson);
 
             var popupcontent = '<input type="text" class="txt"/><div class="show" style="overflow: scroll;min-width: 220px;"></div>';
             popupcontent+= '<div class="btn-add" style="display:none"><button>บันทึก</button></div>';
 
-            map.on('draw:created', function(e) {
+            map.on(L.Draw.Event.CREATED, function(e) {
+				
 
-            	var url = $(location).attr('href'); 
+				var url = $(location).attr('href'); 
+				
+				// draw polygon
+				if (e.layerType === 'polygon') {
+					featureGroup.addLayer(e.layer);
+					var layerPolygon = L.mapbox.featureLayer(e.layer.toGeoJSON()).addTo(map);
+					var polygonCollection = turf.featureCollection([e.layer.toGeoJSON()]);
+					var resGeojson = turf.within(houseCollection, polygonCollection);
+
+					layerPolygon.on('click',function(){
+						var countHouse = resGeojson.features.length;
+						var list ="";
+						resGeojson.features.forEach(function(data){
+							list+= "<br> เลขที่ "+data.properties.title;
+						});
+						alertify.alert("<b>พื้นที่นี้มี  <u>"+countHouse+"</u> หลังคาเรือน</b>" +list)
+					});
+					
+					
+				}
+
+				//end draw polygon
 
             	if(e.layerType === 'marker'){
             		featureGroup.addLayer(e.layer);
@@ -295,13 +327,7 @@
 
 		//var resGeojson = turf.within(,circleCollection);
 
-		var houseGeojson =[];
-		houseLayer.eachLayer(function(layer){
-			if (layer.feature.geometry.coordinates[1]!= null & layer.feature.geometry.coordinates[0]!= null){
-				houseGeojson.push(layer.feature);
-			}
-		});
-		var houseCollection = turf.featureCollection(houseGeojson);
+		
 
 		var resGeojson = turf.within(houseCollection,circleCollection);
 		var countHouse = resGeojson.features.length;
